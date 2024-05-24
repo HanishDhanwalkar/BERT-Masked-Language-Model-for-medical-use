@@ -4,7 +4,6 @@ from datasets import DatasetDict
 from transformers import DataCollatorForLanguageModeling
 from transformers import TrainingArguments, Trainer, pipeline
 
-import torch
 
 import collections
 import numpy as np
@@ -104,21 +103,24 @@ class MLM():
         return preds, (preds[0]['sequence']), (preds[0]['token_str'])
     
 
+import torch
 
-# device = "cuda:0" if torch.cuda.is_available() else "cpu"
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-# lan = "eng"
+# Assuming MLM class has a `model` attribute
+mlm = MLM(data="short/100sentences_eng.txt")
+mlm.model.to(device)  # Move the model to the chosen device
 
-# # text ="किसी अन्य कारण से [MASK] जांच कराने पर इस स्थिति का पता चल सकता है" # hin
-# text = "Diagnosis [MASK] may not know you have atrial fibrillation AFib" # eng
+text = "किसी अन्य कारण से [MASK] जांच कराने पर इस स्थिति का पता चल सकता है"
+text_tensor = mlm.tokenizer(text, return_tensors="pt").to(device)  # Move the input to the device
+
+preds, best_pred, best_string = mlm.predict(text_tensor)
+# lan = "hin"
 
 # mlm = MLM(data = f"data/short/100sentences_{lan}.txt")
-# mlm.model.to(device)  # Move the model to the chosen 
-
 # mlm.start()
 
-
-# preds, best_pred, best_string = mlm.predict(text)
+# preds, best_pred, best_string = mlm.predict("किसी अन्य कारण से [MASK] जांच कराने पर इस स्थिति का पता चल सकता है")
 
 # print(best_pred)
 # print(best_string)
